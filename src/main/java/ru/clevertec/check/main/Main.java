@@ -40,5 +40,6 @@ public class Main {
           System.out.println(sb);
           checkProxy.printCheck(sb);
           checkProxy.printPDFCheck(sb);
+
      }
 }
