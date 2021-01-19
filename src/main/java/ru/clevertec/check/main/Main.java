@@ -10,12 +10,13 @@ import ru.clevertec.check.myLinkedList.MyLinked;
 import ru.clevertec.check.myLinkedList.impl.MyLinkedList;
 import ru.clevertec.check.parser.ArgParser;
 import ru.clevertec.check.parser.impl.ArgsParserImpl;
+import ru.clevertec.check.parser.impl.JsonParserImpl;
 import ru.clevertec.check.proxy.ProxyFactory;
 import java.util.*;
 
 public class Main {
 
-     public static void main(String[] args) throws ProductException {
+     public static void main(String[] args) throws ProductException, IllegalAccessException {
           args = new String[]{"5-40", "1-70", "2-120", "3-100", "4-100", "3-35", "4-7"};
           //args = new String[]{"src\\main\\resources\\file.txt"};
 
