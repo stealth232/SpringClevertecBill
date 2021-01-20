@@ -15,7 +15,7 @@ public class JsonParserImpl implements JsonParser {
     public static final String COLON = ":";
 
     @Override
-    public String parseToJson(Object object) throws IllegalAccessException {
+    public String parseJson(Object object) throws IllegalAccessException {
         StringBuilder sb = new StringBuilder();
         if (object == null) {
             return null;
@@ -54,7 +54,7 @@ public class JsonParserImpl implements JsonParser {
                 return sb.toString();
 
             case "int[]" :
-                appendIntegerPrimitiveArray(sb, object);
+                appendIntArray(sb, object);
                 return sb.toString();
 
             case "Boolean" :
@@ -103,7 +103,7 @@ public class JsonParserImpl implements JsonParser {
                     break;
 
                 case "int[]" :
-                    appendIntegerPrimitiveArray(sb, obj);
+                    appendIntArray(sb, obj);
                     break;
             }
         } else {
@@ -155,7 +155,7 @@ public class JsonParserImpl implements JsonParser {
         Object[] objects = collection.toArray();
         sb.append(SQUARE_BRACE_OPEN);
         for (int i = 0; i < objects.length; i++) {
-            sb.append(parseToJson(objects[i]));
+            sb.append(parseJson(objects[i]));
             if (i < objects.length - 1) {
                 sb.append(COMMA);
             }
@@ -189,7 +189,7 @@ public class JsonParserImpl implements JsonParser {
         sb.append(SQUARE_BRACE_CLOSE);
     }
 
-    private void appendIntegerPrimitiveArray(StringBuilder sb, Object obj) {
+    private void appendIntArray(StringBuilder sb, Object obj) {
         sb.append(SQUARE_BRACE_OPEN);
         int[] array = (int[]) obj;
         for (int i = 0; i < array.length; i++) {

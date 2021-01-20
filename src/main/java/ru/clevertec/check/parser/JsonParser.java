@@ -1,6 +1,6 @@
 package ru.clevertec.check.parser;
 
 public interface JsonParser {
-    String parseToJson(Object object) throws IllegalAccessException;
+    String parseJson(Object object) throws IllegalAccessException;
 
 }
