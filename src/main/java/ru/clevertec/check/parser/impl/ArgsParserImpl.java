@@ -20,7 +20,7 @@ public class ArgsParserImpl implements ArgParser {
     public MyLinkedList<String> parsParams(String[] args) throws ProductException {
         List<String> products = null;
         try {
-            args[0].isBlank();
+            args[0].isEmpty();
         }catch(IndexOutOfBoundsException e){
             throw new ProductException("Try buy something");
         }

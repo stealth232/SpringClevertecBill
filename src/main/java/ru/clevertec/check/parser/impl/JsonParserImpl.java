@@ -1,5 +1,6 @@
 package ru.clevertec.check.parser.impl;
 
+import ru.clevertec.check.myLinkedList.MyLinked;
 import ru.clevertec.check.parser.JsonParser;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -29,6 +30,12 @@ public class JsonParserImpl implements JsonParser {
             appendMap(sb, object);
             return sb.toString();
         }
+
+//        if (StringBuilder.class.isAssignableFrom(object.getClass())) {
+//            StringBuilder out = (StringBuilder) object;
+//            return out.toString();
+//        }
+
         String className = object.getClass().getSimpleName();
         switch (className) {
             case "String" :
@@ -41,9 +48,6 @@ public class JsonParserImpl implements JsonParser {
                 sb.append(object.toString());
                 return sb.toString();
 
-            case "int":
-                sb.append(object.toString());
-                return sb.toString();
 
             case "String[]":
                 appendStringArray(sb, object);
@@ -61,10 +65,12 @@ public class JsonParserImpl implements JsonParser {
                 sb.append(object.toString());
                 return sb.toString();
 
-            case "boolean" :
+
+            case "Double" :
                 sb.append(object.toString());
                 return sb.toString();
         }
+
 
         Field[] fields = object.getClass().getDeclaredFields();
         sb.append(BRACE_OPEN);
@@ -116,15 +122,11 @@ public class JsonParserImpl implements JsonParser {
                     sb.append(obj);
                     break;
 
-                case "int" :
-                    sb.append(obj);
-                    break;
-
                 case "Boolean":
                     sb.append(obj);
                     break;
 
-                case "boolean" :
+                case "Double" :
                     sb.append(obj);
                     break;
             }

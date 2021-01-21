@@ -11,4 +11,5 @@ public interface MyLinked <E> {
     void removeFirst();
     E getFirstElem();
     E getLastElem();
+    Object[] toArray();
 }

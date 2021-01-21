@@ -78,7 +78,7 @@ dependencies {
     compile "org.aspectj:aspectjrt:1.9.5"
     ajc "org.aspectj:aspectjtools:1.9.5"
     compile "org.aspectj:aspectjweaver:1.9.5"
-
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
     runtimeAgent "org.springframework:spring-instrument"
     runtimeAgent "org.aspectj:aspectjweaver"
     compile "org.springframework.cloud:spring-cloud-dependencies:2020.0.0"

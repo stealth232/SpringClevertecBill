@@ -6,7 +6,7 @@ import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.myLinkedList.impl.MyLinkedList;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-
+import java.util.List;
 import java.io.*;
 import java.util.Date;
 import java.util.Map;
@@ -25,7 +25,7 @@ public class CheckImpl implements Check {
     }
 
     @Override
-    public StringBuilder showCheck(MyLinkedList<Product> list){
+    public StringBuilder showCheck(List<Product> list){
         StringBuilder sb = new StringBuilder();
         Date date = new Date();
         Card card = new Card(0);
@@ -91,7 +91,7 @@ public class CheckImpl implements Check {
     }
 
     @Override
-    public StringBuilder htmlCheck(MyLinkedList<Product> list){
+    public StringBuilder htmlCheck(List<Product> list){
         StringBuilder sb = new StringBuilder();
         Date date = new Date();
         Card card = new Card(0);
