@@ -1,5 +1,7 @@
 package ru.clevertec.check.creator.impl;
 
+import ru.clevertec.check.annotations.LogLevel;
+import ru.clevertec.check.annotations.LogMe;
 import ru.clevertec.check.creator.OrderCreator;
 import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.myLinkedList.impl.MyLinkedList;
@@ -15,6 +17,7 @@ public class OrderCreatorImpl implements OrderCreator {
     static Logger logger = LogManager.getLogger();
 
     private static final String QUANTITY_DELIMITER = "-";
+    @LogMe(LogLevel.ERROR)
     @Override
     public Map<String, Integer> order(MyLinkedList<String> list) throws ProductException {
         BiFunction<Integer, Integer, Integer> bFunc = (oldValue, newValue) -> oldValue + newValue;

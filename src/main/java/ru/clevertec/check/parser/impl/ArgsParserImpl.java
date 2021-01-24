@@ -1,5 +1,7 @@
 package ru.clevertec.check.parser.impl;
 
+import ru.clevertec.check.annotations.LogLevel;
+import ru.clevertec.check.annotations.LogMe;
 import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.myLinkedList.impl.MyLinkedList;
 import ru.clevertec.check.parser.ArgParser;
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 public class ArgsParserImpl implements ArgParser {
 
     private static final String DELIMITER = "\\s";
-
+    @LogMe(LogLevel.FATAL)
     @Override
     public MyLinkedList<String> parsParams(String[] args) throws ProductException {
         List<String> products = null;

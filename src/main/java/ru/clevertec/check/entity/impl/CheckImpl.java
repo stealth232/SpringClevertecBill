@@ -1,5 +1,6 @@
 package ru.clevertec.check.entity.impl;
 
+import ru.clevertec.check.annotations.LogMe;
 import ru.clevertec.check.entity.Card;
 import ru.clevertec.check.entity.Check;
 import ru.clevertec.check.exception.ProductException;
@@ -23,7 +24,7 @@ public class CheckImpl implements Check {
     public CheckImpl(Map<String, Integer> map) {
         this.map = map;
     }
-
+@LogMe
     @Override
     public StringBuilder showCheck(List<Product> list){
         StringBuilder sb = new StringBuilder();

@@ -31,10 +31,9 @@ public class JsonParserImpl implements JsonParser {
             return sb.toString();
         }
 
-//        if (StringBuilder.class.isAssignableFrom(object.getClass())) {
-//            StringBuilder out = (StringBuilder) object;
-//            return out.toString();
-//        }
+        if (StringBuilder.class.isAssignableFrom(object.getClass())) {
+            return sb.toString();
+        }
 
         String className = object.getClass().getSimpleName();
         switch (className) {
@@ -47,7 +46,6 @@ public class JsonParserImpl implements JsonParser {
             case "Integer":
                 sb.append(object.toString());
                 return sb.toString();
-
 
             case "String[]":
                 appendStringArray(sb, object);
