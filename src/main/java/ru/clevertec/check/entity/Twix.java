@@ -1,8 +1,8 @@
 package ru.clevertec.check.entity;
 
-import ru.clevertec.check.entity.impl.Product;
+import ru.clevertec.check.entity.impl.ProductAbstract;
 
-public class Twix extends Product {
+public class Twix extends ProductAbstract {
     private int itemId = 5;
     private String name = "Twix";
     private double cost = 1.79;

@@ -1,8 +1,8 @@
 package ru.clevertec.check.entity;
 
-import ru.clevertec.check.entity.impl.Product;
+import ru.clevertec.check.entity.impl.ProductAbstract;
 
-public class Snickers extends Product {
+public class Snickers extends ProductAbstract {
     private int itemId = 1;
     private String name = "Snickers";
     private double cost = 1.99;

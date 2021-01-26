@@ -3,9 +3,9 @@ package ru.clevertec.check.servlets;
 import ru.clevertec.check.creator.impl.OrderCreatorImpl;
 import ru.clevertec.check.entity.*;
 import ru.clevertec.check.entity.impl.CheckImpl;
-import ru.clevertec.check.entity.impl.Product;
 import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.myLinkedList.impl.MyLinkedList;
+import ru.clevertec.check.parameters.ProductParameters;
 import ru.clevertec.check.parser.impl.ArgsParserImpl;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet("/hello")
@@ -21,7 +22,7 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws IOException {
         resp.setContentType("text/html");
         PrintWriter writer = resp.getWriter();
         String[] itemId = req.getParameterValues("itemId");
@@ -39,7 +40,7 @@ public class MainServlet extends HttpServlet {
             }
         }
 
-        MyLinkedList<Product> products = new MyLinkedList<>(); //список продуктов
+        List<ProductParameters> products = new MyLinkedList<>();
         products.add(new Bounty());
         products.add(new Snickers());
         products.add(new Nuts());

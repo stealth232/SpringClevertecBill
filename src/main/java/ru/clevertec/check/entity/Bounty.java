@@ -1,10 +1,10 @@
 package ru.clevertec.check.entity;
 
-import ru.clevertec.check.entity.impl.Product;
+import ru.clevertec.check.entity.impl.ProductAbstract;
 
 import java.util.Objects;
 
-public class Bounty extends Product {
+public class Bounty extends ProductAbstract {
     private int itemId = 3;
     private String name = "Bounty";
     private double cost = 1.29;

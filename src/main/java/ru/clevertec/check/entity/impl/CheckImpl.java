@@ -3,10 +3,12 @@ package ru.clevertec.check.entity.impl;
 import ru.clevertec.check.annotations.LogMe;
 import ru.clevertec.check.entity.Card;
 import ru.clevertec.check.entity.Check;
+import ru.clevertec.check.entity.Product;
 import ru.clevertec.check.exception.ProductException;
-import ru.clevertec.check.myLinkedList.impl.MyLinkedList;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import ru.clevertec.check.parameters.ProductParameters;
+
 import java.util.List;
 import java.io.*;
 import java.util.Date;
@@ -24,9 +26,9 @@ public class CheckImpl implements Check {
     public CheckImpl(Map<String, Integer> map) {
         this.map = map;
     }
-@LogMe
+    @LogMe
     @Override
-    public StringBuilder showCheck(List<Product> list){
+    public StringBuilder showCheck(List<ProductParameters> list){
         StringBuilder sb = new StringBuilder();
         Date date = new Date();
         Card card = new Card(0);
@@ -92,7 +94,7 @@ public class CheckImpl implements Check {
     }
 
     @Override
-    public StringBuilder htmlCheck(List<Product> list){
+    public StringBuilder htmlCheck(List<ProductParameters> list){
         StringBuilder sb = new StringBuilder();
         Date date = new Date();
         Card card = new Card(0);
