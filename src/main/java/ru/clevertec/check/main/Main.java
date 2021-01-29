@@ -1,52 +1,54 @@
 package ru.clevertec.check.main;
 
-import ru.clevertec.check.creator.OrderCreator;
-import ru.clevertec.check.creator.impl.OrderCreatorImpl;
+import ru.clevertec.check.observer.entity.State;
+import ru.clevertec.check.observer.listeners.Consoler;
+import ru.clevertec.check.observer.listeners.Emailer;
+import ru.clevertec.check.observer.listeners.EventListener;
+import ru.clevertec.check.service.Check;
+import ru.clevertec.check.utils.creator.OrderCreator;
+import ru.clevertec.check.utils.creator.impl.OrderCreatorImpl;
 import ru.clevertec.check.dao.DBController;
 import ru.clevertec.check.dao.Repository;
-import ru.clevertec.check.entity.*;
-import ru.clevertec.check.entity.impl.CheckImpl;
+import ru.clevertec.check.service.impl.CheckImpl;
 import ru.clevertec.check.exception.ProductException;
-import ru.clevertec.check.myLinkedList.impl.MyLinkedList;
+import ru.clevertec.check.utils.mylinkedlist.impl.MyLinkedList;
 import ru.clevertec.check.parameters.ProductParameters;
-import ru.clevertec.check.parser.ArgParser;
-import ru.clevertec.check.parser.impl.ArgsParserImpl;
-import ru.clevertec.check.proxy.ProxyFactory;
+import ru.clevertec.check.utils.parser.ArgParser;
+import ru.clevertec.check.utils.parser.impl.ArgsParserImpl;
+import ru.clevertec.check.utils.proxy.ProxyFactory;
+
 import java.util.List;
 import java.util.Map;
 
 public class Main {
 
-     public static void main(String[] args) throws ProductException {
-         args = new String[]{"5-40", "1-70", "2-120", "3-100", "4-100", "3-35", "4-7"};
-//         args = new String[]{"src\\main\\resources\\file.txt"};
+    public static void main(String[] args) throws ProductException {
+        args = new String[]{"1-40", "2-70", "3-120", "4-100", "5-100", "6-35", "7-7", "6-35", "card-5678"};
+        //args = new String[]{"src\\main\\resources\\file.txt"};
 
+        DBController database = new DBController();
+        Repository repository = Repository.getInstance(database);
+        repository.removeTable();
+        repository.createTable();
+        repository.fillRepository();
 
-         DBController database = new DBController();
-         Repository repository = Repository.getInstance(database);
-         repository.removeTable(); // удаление таблицы
-         repository.createTable(); // создание таблицы
-         repository.fillRepository(); // наполнение товарами из созданных объектов
-
-         List<ProductParameters> products = new MyLinkedList<>();
-         List<ProductParameters> productsProxy = (List<ProductParameters>) ProxyFactory.doProxy(products);
-         for (int i = 1; i < repository.getSize() + 1; i++){ // перевод товаров из таблицы в объекты
-             productsProxy.add(repository.getId(i));
-         }
-
-         ArgsParserImpl argParser = new ArgsParserImpl();
-         OrderCreatorImpl orderCreator = new OrderCreatorImpl();
-         ArgParser argParserProxy = (ArgParser) ProxyFactory.doProxy(argParser);
-         OrderCreator orderCreatorProxy = (OrderCreator) ProxyFactory.doProxy(orderCreator);
-         MyLinkedList<String> list = argParserProxy.parsParams(args);
-         Map<String, Integer> map = orderCreatorProxy.order(list);
-         CheckImpl check = new CheckImpl(map);
-         Check checkProxy = (Check) ProxyFactory.doProxy(check);
-         StringBuilder sb = checkProxy.showCheck(products);
-         System.out.println(sb);
-         checkProxy.printCheck(sb);
-         checkProxy.printPDFCheck(sb);
-
-
-     }
+        List<ProductParameters> products = new MyLinkedList<>();
+        List<ProductParameters> productsProxy = (List<ProductParameters>) ProxyFactory.doProxy(products);
+        for (int i = 1; i < repository.getSize() + 1; i++) {
+            productsProxy.add(repository.getId(i));
+        }
+        ArgParser argParser = new ArgsParserImpl();
+        OrderCreator orderCreator = new OrderCreatorImpl();
+        List<String> list = argParser.parsParams(args);
+        Map<String, Integer> map = orderCreator.makeOrder(list);
+        Check check = new CheckImpl(map);
+        StringBuilder sb = check.showCheck(products);
+        System.out.println(sb);
+        EventListener consoler = new Consoler();
+        EventListener emailer = new Emailer();
+        check.getPublisher().subscribe(State.CHECK_WAS_PRINTED_IN_TXT, consoler);
+        check.getPublisher().subscribe(State.CHECK_WAS_PRINTED_IN_PDF, emailer);
+        check.printCheck(sb);
+        check.printPDFCheck(sb);
+    }
 }
