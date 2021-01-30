@@ -1,25 +1,28 @@
 package ru.clevertec.check.dao;
 
+import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.utils.builders.Builder;
 import ru.clevertec.check.utils.builders.ProductBuilder;
 import ru.clevertec.check.entities.parameters.ProductParameters;
 
 import java.sql.*;
 
+import static ru.clevertec.check.exception.ProductExceptionConstants.SQL_EXCEPTION;
+
 public class Repository {
     private static DBController controller = new DBController();
     private static Repository instance = new Repository(new DBController());
 
-    private static String insertQuery = "insert into products (name, cost, stock) values (?, ?, ?)";
-    private static String updateQuery = "update products set name = ? where id = ?";
-    private static String updateStockByNameQuery = "update products set stock = ? where name = ?";
-    private static String updateStockByIdQuery = "update products set stock = ? where id = ?";
-    private static String truncateQuery = "truncate table products";
-    private static String dropQuery = "drop table products";
-    private static String deleteQuery = "delete from products where id = ?";
-    private static String selectQuery = "select * from products where id = ?";
-    private static String getSizeQuery = "SELECT COUNT (*) AS rowcount FROM products";
-    private static String createQuery = "create table products " +
+    private final static String insertQuery = "insert into products (name, cost, stock) values (?, ?, ?)";
+    private final static String updateQuery = "update products set name = ? where id = ?";
+    private final static String updateStockByNameQuery = "update products set stock = ? where name = ?";
+    private final static String updateStockByIdQuery = "update products set stock = ? where id = ?";
+    private final static String truncateQuery = "truncate table products";
+    private final static String dropQuery = "drop table products";
+    private final static String deleteQuery = "delete from products where id = ?";
+    private final static String selectQuery = "select * from products where id = ?";
+    private final static String getSizeQuery = "SELECT COUNT (*) AS rowcount FROM products";
+    private final static String createQuery = "create table products " +
             "(" +
             "id serial constraint product_pk primary key, " +
             "name varchar(255) UNIQUE , " +
@@ -35,7 +38,7 @@ public class Repository {
         instance = this;
     }
 
-    public boolean insert(ProductParameters product) {
+    public boolean insert(ProductParameters product) throws ProductException {
         try (Connection connection = controller.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(insertQuery);
             statement.setString(1, product.getName());
@@ -44,7 +47,7 @@ public class Repository {
             int rows = statement.executeUpdate();
             return rows == 1;
         } catch (SQLException e) {
-            return false;
+        throw new ProductException(SQL_EXCEPTION);
         }
     }
 
@@ -91,22 +94,21 @@ public class Repository {
         }
     }
 
-    public ProductParameters getId(Integer id) {
+    public ProductParameters getId(Integer id) throws ProductException{
         try (Connection connection = controller.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(selectQuery);
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             Builder productBuilder = new ProductBuilder();
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 productBuilder.setId(resultSet.getInt(1));
                 productBuilder.setCost(resultSet.getDouble(3));
                 productBuilder.setName(resultSet.getString(2));
                 productBuilder.setStock(resultSet.getBoolean(4));
-
             }
             return productBuilder.getProduct();
         } catch (SQLException e) {
-            return null;
+            throw new ProductException(SQL_EXCEPTION);
         }
     }
 

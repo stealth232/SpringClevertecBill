@@ -7,4 +7,5 @@ public class ProductExceptionConstants {
     public static final String DOCUMENT_EXCEPTION = "Document problem";
     public static final String NO_FILE_EXCEPTION = "Cant find file";
     public static final String ENCODING_EXCEPTION = "Encoding exception";
+    public static final String SQL_EXCEPTION = "SQLException";
 }

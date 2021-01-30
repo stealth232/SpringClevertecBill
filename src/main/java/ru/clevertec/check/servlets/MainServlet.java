@@ -49,7 +49,11 @@ public class MainServlet extends HttpServlet {
         List<ProductParameters> products = new MyLinkedList<>();
         List<ProductParameters> productsProxy = (List<ProductParameters>) ProxyFactory.doProxy(products);
         for (int i = 1; i < repository.getSize() + 1; i++) {
-            productsProxy.add(repository.getId(i));
+            try {
+                productsProxy.add(repository.getId(i));
+            } catch (ProductException e) {
+                e.printStackTrace();
+            }
         }
 
         ArgsParserImpl ap = new ArgsParserImpl();
