@@ -1,16 +1,14 @@
 package ru.clevertec.check.service.impl;
 
 import ru.clevertec.check.annotations.log.LogMe;
-import ru.clevertec.check.dao.DBController;
 import ru.clevertec.check.dao.Repository;
 import ru.clevertec.check.entities.Card;
 import ru.clevertec.check.observer.Publisher;
-import ru.clevertec.check.observer.listeners.Listener;
 import ru.clevertec.check.service.Check;
 import ru.clevertec.check.exception.ProductException;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import ru.clevertec.check.parameters.ProductParameters;
+import ru.clevertec.check.entities.parameters.ProductParameters;
 
 import javax.mail.MessagingException;
 import java.util.List;
@@ -18,6 +16,7 @@ import java.io.*;
 import java.util.Date;
 import java.util.Map;
 
+import static ru.clevertec.check.exception.ProductExceptionConstants.*;
 import static ru.clevertec.check.observer.entity.State.*;
 import static ru.clevertec.check.service.CheckConstants.*;
 
@@ -25,8 +24,7 @@ public class CheckImpl implements Check {
 
     private Publisher publisher = new Publisher(CHECK_WAS_PRINTED_IN_PDF, CHECK_WAS_PRINTED_IN_TXT, CHECK_HAS_NOT_PRINTED);
     private Map<String, Integer> map;
-    private DBController database = new DBController();
-    private Repository repository = Repository.getInstance(database);
+    private Repository repository = Repository.getInstance();
 
     public CheckImpl(Map<String, Integer> map) {
         this.map = map;
@@ -73,26 +71,26 @@ public class CheckImpl implements Check {
             }
         }
         sb.append(TRANFER);
-        if (card.getNumber() == 0) {
+        if (card.getNumber() == CARD_RANGE_0) {
             sb.append(" \nNo Discount Card ");
-            sb.append(String.format("\nYour Discount   %25.2f", discount));
-            sb.append(String.format("\nTotal Price   %27.2f", totalPrice));
+            sb.append(String.format(DISCOUNT, discount));
+            sb.append(String.format(PRICE, totalPrice));
         } else {
 
-            if (card.getNumber() > 0 && card.getNumber() < 100) {
+            if (card.getNumber() > CARD_RANGE_0 && card.getNumber() < CARD_RANGE_100) {
                 sb.append(" \nYour Card with 3% Discount № " + card.getNumber());
-                sb.append(String.format("\nYour Discount   %25.2f", discount + totalPrice * PERCENT3));
-                sb.append(String.format("\nTotal Price   %27.2f", totalPrice * PERCENT97));
+                sb.append(String.format(DISCOUNT, discount + totalPrice * PERCENT3));
+                sb.append(String.format(PRICE, totalPrice * PERCENT97));
             }
-            if (card.getNumber() > 99 && card.getNumber() < 1000) {
+            if (card.getNumber() >= CARD_RANGE_100 && card.getNumber() < CARD_RANGE_1000) {
                 sb.append(" \nYour Card with 4% Discount № " + card.getNumber());
-                sb.append(String.format("\nYour Discount   %25.2f", discount + totalPrice * PERCENT4));
-                sb.append(String.format("\nTotal Price   %27.2f", totalPrice * PERCENT96));
+                sb.append(String.format(DISCOUNT, discount + totalPrice * PERCENT4));
+                sb.append(String.format(PRICE, totalPrice * PERCENT96));
             }
-            if (card.getNumber() > 999) {
+            if (card.getNumber() >= CARD_RANGE_1000) {
                 sb.append(" \nYour Card with 5% Discount № " + card.getNumber());
-                sb.append(String.format("\nYour Discount   %25.2f", discount + totalPrice * PERCENT5));
-                sb.append(String.format("\nTotal Price   %27.2f", totalPrice * PERCENT95));
+                sb.append(String.format(DISCOUNT, discount + totalPrice * PERCENT5));
+                sb.append(String.format(PRICE, totalPrice * PERCENT95));
             }
         }
         return sb;
@@ -104,7 +102,7 @@ public class CheckImpl implements Check {
         StringBuilder sb = new StringBuilder();
         Date date = new Date();
         Card card = new Card(0);
-        sb.append("<html>").
+        sb.append(HTML_OPEN).
                 append("<head><h2><pre>        CASH RECEIPT</pre></h2></head>").
                 append("<pre>        supermarket 'The Two Geese'</pre> ").
                 append(String.format("<pre>       %s </pre>    ", date.toString())).
@@ -114,6 +112,7 @@ public class CheckImpl implements Check {
         double totalPriceProduct;
         double totalPrice = 0;
         double discount = 0;
+        int repositorySize = repository.getSize();
         String line;
         for (Map.Entry<String, Integer> entry : map.entrySet()
         ) {
@@ -122,7 +121,7 @@ public class CheckImpl implements Check {
                     key = Integer.parseInt(entry.getKey());
                     if (list.get(i).getItemId() == key) {
                         quantity = entry.getValue();
-                        if (list.get(i).isStock() && quantity >= 5) {
+                        if (list.get(i).isStock() && quantity >= repositorySize) {
                             totalPriceProduct = list.get(i).getCost() * quantity * PERCENT90;
                         } else {
                             totalPriceProduct = list.get(i).getCost() * quantity;
@@ -138,42 +137,42 @@ public class CheckImpl implements Check {
                 card = new Card(entry.getValue());
             }
         }
-        sb.append("===================================");
-        if (card.getNumber() == 0) {
+        sb.append(TRANFER);
+        if (card.getNumber() == CARD_RANGE_0) {
             sb.append("<pre>No Discount Card </pre>");
-            sb.append(String.format("<pre>Your Discount     %25.2f</pre>", discount));
-            sb.append(String.format("<h4><pre><h2>Total Price %17.2f</pre></h4>", totalPrice));
+            sb.append(String.format(DISCOUNT_HTML, discount));
+            sb.append(String.format(PRICE_HTML, totalPrice));
         } else {
-            if (card.getNumber() > 0 && card.getNumber() < 100) {
+            if (card.getNumber() > CARD_RANGE_0 && card.getNumber() < CARD_RANGE_100) {
                 sb.append("<pre>Your Card with 3% Discount: </pre>" + card.getNumber());
-                sb.append(String.format("<pre>Your Discount     %25.2f</pre>", discount + totalPrice * PERCENT3));
-                sb.append(String.format("<h4><pre><h2>Total Price %17.2f</pre></h4>", totalPrice * PERCENT97));
+                sb.append(String.format(DISCOUNT_HTML, discount + totalPrice * PERCENT3));
+                sb.append(String.format(PRICE_HTML, totalPrice * PERCENT97));
             }
-            if (card.getNumber() > 99 && card.getNumber() < 1000) {
+            if (card.getNumber() >= CARD_RANGE_100 && card.getNumber() < CARD_RANGE_1000) {
                 sb.append("<pre>Your Card with 4% Discount: </pre>" + card.getNumber());
-                sb.append(String.format("<pre>Your Discount     %25.2f</pre>", discount + totalPrice * PERCENT4));
-                sb.append(String.format("<h4><pre><h2>Total Price %17.2f</pre></h4>", totalPrice * PERCENT96));
+                sb.append(String.format(DISCOUNT_HTML, discount + totalPrice * PERCENT4));
+                sb.append(String.format(PRICE_HTML, totalPrice * PERCENT96));
             }
-            if (card.getNumber() > 999) {
+            if (card.getNumber() >= CARD_RANGE_1000) {
                 sb.append("<pre>Your Card with 5% Discount: </pre>" + card.getNumber());
-                sb.append(String.format("<pre>Your Discount     %25.2f</pre>", discount + totalPrice * PERCENT5));
-                sb.append(String.format("<h4><pre><h2>Total Price %17.2f</pre></h4>", totalPrice * PERCENT95));
+                sb.append(String.format(DISCOUNT_HTML, discount + totalPrice * PERCENT5));
+                sb.append(String.format(PRICE_HTML, totalPrice * PERCENT95));
             }
         }
-        sb.append("</html>");
+        sb.append(HTML_CLOSE);
         return sb;
 
     }
 
     @Override
     public void printCheck(StringBuilder sb) throws ProductException {
-        File file = new File(CHECKFILE);
+        File file = new File(CHECKFILETXT);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(sb.toString());
             writer.close();
             publisher.notify(CHECK_WAS_PRINTED_IN_TXT, "Check was printed in TXT file");
         } catch (IOException | MessagingException e) {
-            throw new ProductException("Cant find filepath");
+            throw new ProductException(IOEXCEPTION);
         }
     }
 
@@ -188,17 +187,17 @@ public class CheckImpl implements Check {
             document.add(new Paragraph(INDENT));
             document.add(new Paragraph(sb.toString()));
             PdfReader reader = new PdfReader(new FileInputStream(PDFTEMPLATE));
-            PdfImportedPage page = writer.getImportedPage(reader, 1);
+            PdfImportedPage page = writer.getImportedPage(reader, PAGENUMBER);
             PdfContentByte pdfContentByte = writer.getDirectContentUnder();
-            pdfContentByte.addTemplate(page, X, Y);
+            pdfContentByte.addTemplate(page, COORD_X, COORD_Y);
             document.close();
             publisher.notify(CHECK_WAS_PRINTED_IN_PDF, "Check was printed in PDF file");
         } catch (DocumentException e) {
-            throw new ProductException("Document problem");
+            throw new ProductException(DOCUMENT_EXCEPTION);
         } catch (FileNotFoundException e) {
-            throw new ProductException("Cant find file");
+            throw new ProductException(NO_FILE_EXCEPTION);
         } catch (IOException | MessagingException e) {
-            throw new ProductException("IO problem");
+            throw new ProductException(IOEXCEPTION);
         }
     }
 

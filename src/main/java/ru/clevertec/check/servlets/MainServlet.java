@@ -5,8 +5,8 @@ import ru.clevertec.check.dao.DBController;
 import ru.clevertec.check.dao.Repository;
 import ru.clevertec.check.service.impl.CheckImpl;
 import ru.clevertec.check.exception.ProductException;
-import ru.clevertec.check.utils.mylinkedlist.impl.MyLinkedList;
-import ru.clevertec.check.parameters.ProductParameters;
+import ru.clevertec.check.utils.mylinkedlist.MyLinkedList;
+import ru.clevertec.check.entities.parameters.ProductParameters;
 import ru.clevertec.check.utils.parser.impl.ArgsParserImpl;
 import ru.clevertec.check.utils.proxy.ProxyFactory;
 import javax.servlet.ServletException;
@@ -41,8 +41,7 @@ public class MainServlet extends HttpServlet {
             }
         }
 
-        DBController database = new DBController();
-        Repository repository = Repository.getInstance(database);
+        Repository repository = Repository.getInstance();
         repository.removeTable();
         repository.createTable();
         repository.fillRepository();

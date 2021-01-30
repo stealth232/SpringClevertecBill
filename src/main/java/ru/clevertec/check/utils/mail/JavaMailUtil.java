@@ -9,51 +9,46 @@ import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.*;
 import java.util.Date;
-import java.util.Properties;
 
+import static ru.clevertec.check.exception.ProductExceptionConstants.*;
+import static ru.clevertec.check.service.CheckConstants.CHECKFILEPDF;
 import static ru.clevertec.check.utils.mail.JavaMailProperties.*;
 
 public class JavaMailUtil {
     private static Logger logger = LogManager.getLogger();
 
     public static void sendMail() throws ProductException {
-        System.out.println("Preparing to send");
+        logger.info("Preparing to send");
         try {
-            Properties properties = getProperties(PROPS_FILE);
-            String myAccountEmail = MY_EMAIL_ACCOUNT;
-            String password = PASSWORD;
             Session session = Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(myAccountEmail, password);
+                    return new PasswordAuthentication(MY_EMAIL_ACCOUNT, PASSWORD);
                 }
             });
-            if (Boolean.valueOf(ATTACH)) {
-                Message message = prepareMessageWithContent(session, myAccountEmail, EMAIL_RECIPIENT);
+            if (Boolean.parseBoolean(ATTACH)) {
+                Message message = prepareMessageWithContent(session, MY_EMAIL_ACCOUNT, EMAIL_RECIPIENT);
                 Transport.send(message);
-                System.out.println("Send successfully with PDF");
+                logger.info("Send successfully with PDF");
             } else {
-                Message message = prepareMessageWithoutContent(session, myAccountEmail, EMAIL_RECIPIENT);
+                Message message = prepareMessageWithoutContent(session, MY_EMAIL_ACCOUNT, EMAIL_RECIPIENT);
                 Transport.send(message);
-                System.out.println("Send successfully without PDF");
+                logger.info("Send successfully without PDF");
             }
         } catch (MessagingException e) {
-            throw new ProductException("Messaging Exception", e);
+            throw new ProductException(MESSAGE_EXCEPTION, e);
         }
     }
 
     public static void sendMailToListener(String recipient, State eventType, String messageText, String filePath) throws ProductException {
         try {
-            Properties properties = getProperties(PROPS_FILE);
-            String myAccountEmail = MY_EMAIL_ACCOUNT;
-            String password = PASSWORD;
-            Date date = new Date();
             Session session = Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(myAccountEmail, password);
+                    return new PasswordAuthentication(MY_EMAIL_ACCOUNT, PASSWORD);
                 }
             });
+            Date date = new Date();
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(MY_EMAIL_ACCOUNT));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
@@ -67,10 +62,11 @@ public class JavaMailUtil {
             emailContent.addBodyPart(attach);
             message.setContent(emailContent);
             Transport.send(message);
+            logger.info("Mail with " + attach.getFileName() + " was successfully sent to " + recipient);
         } catch (MessagingException e) {
-            throw new ProductException("Messaging Exception", e);
+            throw new ProductException(MESSAGE_EXCEPTION, e);
         } catch (IOException e) {
-            throw new ProductException("IOException", e);
+            throw new ProductException(IOEXCEPTION, e);
         }
     }
 
@@ -90,9 +86,9 @@ public class JavaMailUtil {
             message.setContent(emailContent);
             return message;
         } catch (MessagingException e) {
-            throw new ProductException("Messaging Exception", e);
+            throw new ProductException(MESSAGE_EXCEPTION, e);
         } catch (IOException e) {
-            throw new ProductException("IOException", e);
+            throw new ProductException(IOEXCEPTION, e);
         }
     }
 
@@ -105,9 +101,9 @@ public class JavaMailUtil {
             message.setText(MESSAGE_WITHOUT_ATTACH);
             return message;
         } catch (AddressException e) {
-            throw new ProductException("Address Exception", e);
+            throw new ProductException(ADDRESS_EXCEPTION, e);
         } catch (MessagingException e) {
-            throw new ProductException("Messaging Exception", e);
+            throw new ProductException(MESSAGE_EXCEPTION, e);
         }
     }
 }

@@ -3,7 +3,6 @@ package ru.clevertec.check.utils.creator.impl;
 import ru.clevertec.check.annotations.log.LogLevel;
 import ru.clevertec.check.annotations.log.LogMe;
 import ru.clevertec.check.utils.creator.OrderCreator;
-import ru.clevertec.check.dao.DBController;
 import ru.clevertec.check.dao.Repository;
 import ru.clevertec.check.exception.ProductException;
 
@@ -13,11 +12,12 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public class OrderCreatorImpl implements OrderCreator {
-    private DBController database = new DBController();
-    private Repository repository = Repository.getInstance(database);
+    private Repository repository = Repository.getInstance();
 
     private final String QUANTITY_DELIMITER = "-";
     private final String CARD = "card";
+    private final String INCORRECT_PARAMS = "Parameters are incorrect. Please try again";
+    private final String PLEASE = "Please try to buy something at our store";
 
     @LogMe(LogLevel.ERROR)
     @Override
@@ -34,7 +34,7 @@ public class OrderCreatorImpl implements OrderCreator {
                 try {
                     key = temp[0];
                     if (list.size() == 0) {
-                        throw new ProductException("Please try to buy something at our store");
+                        throw new ProductException(PLEASE);
                     }
                     if (!temp[0].equals(CARD) && repositorySize < Integer.parseInt(temp[0])) {
                         throw new ProductException("There are only " + repositorySize + " products in our test store. " +
@@ -44,11 +44,11 @@ public class OrderCreatorImpl implements OrderCreator {
                         map.merge(key, value, bFunc);
                     }
                 } catch (NumberFormatException e) {
-                    throw new ProductException("Parameters are incorrect. Please try again");
+                    throw new ProductException(INCORRECT_PARAMS);
                 }
             }
         } catch (NumberFormatException e) {
-            throw new ProductException("Parameters are incorrect. Please try again");
+            throw new ProductException(INCORRECT_PARAMS);
         }
         return map;
     }

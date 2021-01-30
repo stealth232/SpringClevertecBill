@@ -1,4 +1,4 @@
-package ru.clevertec.check.utils.mylinkedlist.impl;
+package ru.clevertec.check.utils.mylinkedlist;
 
 import java.util.Collection;
 import java.util.Iterator;

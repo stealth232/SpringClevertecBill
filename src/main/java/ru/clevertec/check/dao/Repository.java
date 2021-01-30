@@ -2,39 +2,37 @@ package ru.clevertec.check.dao;
 
 import ru.clevertec.check.utils.builders.Builder;
 import ru.clevertec.check.utils.builders.ProductBuilder;
-import ru.clevertec.check.parameters.ProductParameters;
+import ru.clevertec.check.entities.parameters.ProductParameters;
 
 import java.sql.*;
 
 public class Repository {
-    private static Repository instance = null;
-    private static DBController controller;
+    private static DBController controller = new DBController();
+    private static Repository instance = new Repository(new DBController());
 
-    private String insertQuery = "insert into products (name, cost, stock) values (?, ?, ?)";
-    private String updateQuery = "update products set name = ? where id = ?";
-    private String updateStockByNameQuery = "update products set stock = ? where name = ?";
-    private String updateStockByIdQuery = "update products set stock = ? where id = ?";
-    private String truncateQuery = "truncate table products";
-    private String dropQuery = "drop table products";
-    private String deleteQuery = "delete from products where id = ?";
-    private String selectQuery = "select * from products where id = ?";
-    private String getSizeQuery = "SELECT COUNT (*) AS rowcount FROM products";
-    private String createQuery = "create table products " +
+    private static String insertQuery = "insert into products (name, cost, stock) values (?, ?, ?)";
+    private static String updateQuery = "update products set name = ? where id = ?";
+    private static String updateStockByNameQuery = "update products set stock = ? where name = ?";
+    private static String updateStockByIdQuery = "update products set stock = ? where id = ?";
+    private static String truncateQuery = "truncate table products";
+    private static String dropQuery = "drop table products";
+    private static String deleteQuery = "delete from products where id = ?";
+    private static String selectQuery = "select * from products where id = ?";
+    private static String getSizeQuery = "SELECT COUNT (*) AS rowcount FROM products";
+    private static String createQuery = "create table products " +
             "(" +
             "id serial constraint product_pk primary key, " +
             "name varchar(255) UNIQUE , " +
             "cost double precision, " +
             "stock boolean);";
 
-    public static Repository getInstance(DBController controller) {
-        if (instance == null)
-            instance = new Repository(controller);
-
+    public static Repository getInstance() {
         return instance;
     }
 
     public Repository(DBController controller) {
         this.controller = controller;
+        instance = this;
     }
 
     public boolean insert(ProductParameters product) {
@@ -200,5 +198,4 @@ public class Repository {
             return false;
         }
     }
-
 }

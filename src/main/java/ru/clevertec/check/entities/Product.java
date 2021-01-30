@@ -1,6 +1,6 @@
 package ru.clevertec.check.entities;
 
-import ru.clevertec.check.parameters.ProductParameters;
+import ru.clevertec.check.entities.parameters.ProductParameters;
 
 public class Product implements ProductParameters {
     private int itemId;

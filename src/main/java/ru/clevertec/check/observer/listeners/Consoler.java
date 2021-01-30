@@ -4,13 +4,14 @@ import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.observer.entity.State;
 import ru.clevertec.check.utils.mail.JavaMailUtil;
 
-import static ru.clevertec.check.utils.mail.JavaMailProperties.CHECKFILETXT;
+import static ru.clevertec.check.service.CheckConstants.CHECKFILETXT;
+import static ru.clevertec.check.utils.mail.JavaMailProperties.MAIL_STEALTH;
 
 public class Consoler implements EventListener {
 
     @Override
     public void update(State eventType, String message) throws ProductException {
-        JavaMailUtil.sendMailToListener("stealth2322@gmail.com", eventType,
+        JavaMailUtil.sendMailToListener(MAIL_STEALTH, eventType,
                 message, CHECKFILETXT);
     }
 }

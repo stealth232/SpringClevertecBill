@@ -1,4 +1,4 @@
-package ru.clevertec.check.parameters;
+package ru.clevertec.check.entities.parameters;
 
 public interface ProductParameters {
 

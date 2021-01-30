@@ -8,8 +8,7 @@ public class ProxyFactory {
 
     public static Object doProxy(Object obj) {
         ClassLoader classLoader = obj.getClass().getClassLoader();
-        Class classObj = obj.getClass();
-        Class[] interfaces = obj.getClass().getInterfaces();
+        Class<?>[] interfaces = obj.getClass().getInterfaces();
         Object proxyObj = (Object) Proxy.newProxyInstance(classLoader, interfaces, new CustomInvocationHandler(obj));
         return proxyObj;
     }

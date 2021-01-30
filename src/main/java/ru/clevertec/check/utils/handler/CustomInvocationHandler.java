@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.clevertec.check.utils.parser.JsonParser;
 import ru.clevertec.check.utils.parser.impl.JsonParserImpl;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -34,11 +35,6 @@ public class CustomInvocationHandler implements InvocationHandler {
             if (args[i].getClass().equals(StringBuilder.class)) {
                 stringBuilder.append("StringBuilder");
                 stringBuilder.append(SPACE);
-            } else if (args[i].getClass().equals(String[].class)) {
-                stringBuilder.append(args[i].getClass().getSimpleName());
-                inputArgs = jsonParser.parseJson(args[i]);
-                stringBuilder.append(inputArgs);
-                stringBuilder.append(SPACE);
             } else {
                 stringBuilder.append(args[i].getClass().getSimpleName());
                 inputArgs = jsonParser.parseJson(args[i]);
@@ -46,13 +42,13 @@ public class CustomInvocationHandler implements InvocationHandler {
                 stringBuilder.append(SPACE);
             }
         }
+        String loggerConstant = COMPLETED + methodName + METHOD_IN
+                + className + CLASS_ARGS + stringBuilder.toString();
         if (method.getReturnType() != void.class) {
-            logger.info(COMPLETED + methodName + METHOD_IN
-                    + className + CLASS_ARGS + stringBuilder.toString() +
+            logger.info(loggerConstant +
                     RESULT + methodReturn + SPACE + resultMethodInvoke);
         } else {
-            logger.info("COMPLETED  " + methodName + METHOD_IN
-                    + className + CLASS_ARGS + stringBuilder.toString());
+            logger.info(loggerConstant);
         }
         return resultMethodInvoke;
     }

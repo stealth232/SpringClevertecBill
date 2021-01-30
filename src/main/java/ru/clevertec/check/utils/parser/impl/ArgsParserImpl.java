@@ -4,6 +4,7 @@ import ru.clevertec.check.annotations.log.LogLevel;
 import ru.clevertec.check.annotations.log.LogMe;
 import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.utils.parser.ArgParser;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -23,11 +24,6 @@ public class ArgsParserImpl implements ArgParser {
     @Override
     public List<String> parsParams(String[] args) throws ProductException {
         List<String> products = null;
-        try {
-            args[0].isEmpty();
-        } catch (IndexOutOfBoundsException e) {
-            throw new ProductException("Try to buy something");
-        }
         if (args[0].contains(TXT) || args[0].contains(XML) || args[0].contains(BIN)) {
             String filePath = args[0];
             products = parsParams(filePath, products);
