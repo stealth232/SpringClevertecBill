@@ -3,7 +3,7 @@ package ru.clevertec.check.utils.parser.impl;
 import ru.clevertec.check.annotations.log.LogLevel;
 import ru.clevertec.check.annotations.log.LogMe;
 import ru.clevertec.check.exception.ProductException;
-import ru.clevertec.check.utils.parser.ArgParser;
+import ru.clevertec.check.utils.parser.ArgsParser;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ArgsParserImpl implements ArgParser {
+public class ArgsParserImpl implements ArgsParser {
 
     private static final String DELIMITER = "\\s";
     private static final String TXT = "txt";

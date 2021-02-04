@@ -5,9 +5,18 @@ public class CheckConstants {
     public static final String CHECKFILEPDF = "D:\\check.pdf";
     public static final String PDFTEMPLATE = "C:\\Users\\Stealth\\IdeaProjects\\NewCheck\\src\\main\\resources\\templates\\Clevertec_Template.pdf";
     public static final String INDENT = "\n" + "\n" + "\n";
+    public static final String DOUBLE_INDENT = "\n\n";
+
     public static final String CARD = "card";
-    public static final String TRANFER = "\n========================================= \n";
+    public static final String TRANSFER = "\n========================================= \n";
+    public static final String TRANSFER_PDF = "=========================================";
+    public static final String TRANSPORT = "                                         ";
+    public static final String TRANSPORT_HALF =  "                   ";
     public static final String DISCOUNT = "\nYour Discount   %25.2f";
+    public static final String DISCOUNT_PDF = "Your Discount";
+    public static final String TOTAL_PRICE_PDF = "Total Price";
+    public static final String DISCOUNT_PDF_FORMAT = "\n %53s  %53.2f";
+    public static final String PRICE_PDF_FORMAT = "\n %51s  %58.2f";
     public static final String PRICE = "\nTotal Price   %27.2f";
     public static final String DISCOUNT_HTML = "<pre>Your Discount     %25.2f</pre>";
     public static final String PRICE_HTML = "<h4><pre><h2>Total Price %17.2f</pre></h4>";

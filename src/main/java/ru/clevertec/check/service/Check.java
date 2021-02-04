@@ -1,8 +1,9 @@
 package ru.clevertec.check.service;
 
+import ru.clevertec.check.entities.parameters.ProductParameters;
 import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.observer.Publisher;
-import ru.clevertec.check.entities.parameters.ProductParameters;
+
 import java.util.List;
 
 public interface Check {
@@ -16,4 +17,6 @@ public interface Check {
     void printPDFCheck(StringBuilder sb) throws ProductException;
 
     Publisher getPublisher();
+
+    StringBuilder pdfCheck(List<ProductParameters> products);
 }

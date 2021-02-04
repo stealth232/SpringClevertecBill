@@ -1,4 +1,4 @@
-package ru.clevertec.check.utils.mail;
+package ru.clevertec.check.utils.mailer;
 
 import java.io.*;
 import java.util.Properties;

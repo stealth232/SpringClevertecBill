@@ -2,9 +2,9 @@ package ru.clevertec.check.utils.creator.impl;
 
 import ru.clevertec.check.annotations.log.LogLevel;
 import ru.clevertec.check.annotations.log.LogMe;
-import ru.clevertec.check.utils.creator.OrderCreator;
 import ru.clevertec.check.dao.Repository;
 import ru.clevertec.check.exception.ProductException;
+import ru.clevertec.check.utils.creator.OrderCreator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,5 +52,4 @@ public class OrderCreatorImpl implements OrderCreator {
         }
         return map;
     }
-
 }

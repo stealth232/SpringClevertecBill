@@ -1,9 +1,9 @@
 package ru.clevertec.check.dao;
 
+import ru.clevertec.check.entities.parameters.ProductParameters;
 import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.utils.builders.Builder;
 import ru.clevertec.check.utils.builders.ProductBuilder;
-import ru.clevertec.check.entities.parameters.ProductParameters;
 
 import java.sql.*;
 
@@ -11,7 +11,7 @@ import static ru.clevertec.check.exception.ProductExceptionConstants.SQL_EXCEPTI
 
 public class Repository {
     private static DBController controller = new DBController();
-    private static Repository instance = new Repository(new DBController());
+    private static Repository instance = new Repository(controller);
 
     private final static String insertQuery = "insert into products (name, cost, stock) values (?, ?, ?)";
     private final static String updateQuery = "update products set name = ? where id = ?";
@@ -47,7 +47,7 @@ public class Repository {
             int rows = statement.executeUpdate();
             return rows == 1;
         } catch (SQLException e) {
-        throw new ProductException(SQL_EXCEPTION);
+            throw new ProductException(SQL_EXCEPTION);
         }
     }
 
@@ -94,7 +94,7 @@ public class Repository {
         }
     }
 
-    public ProductParameters getId(Integer id) throws ProductException{
+    public ProductParameters getId(Integer id) throws ProductException {
         try (Connection connection = controller.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(selectQuery);
             statement.setInt(1, id);
@@ -139,13 +139,11 @@ public class Repository {
             PreparedStatement statement = connection.prepareStatement(truncateQuery);
             return true;
         } catch (SQLException throwables) {
-
             return false;
         }
     }
 
     public boolean createTable() {
-
         try (Connection connection = controller.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(createQuery);
             statement.executeUpdate();
@@ -154,7 +152,6 @@ public class Repository {
             throwables.printStackTrace();
             return false;
         }
-
     }
 
     public boolean fillRepository() {

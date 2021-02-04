@@ -1,4 +1,4 @@
-package ru.clevertec.check.utils.mail;
+package ru.clevertec.check.utils.mailer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +12,7 @@ import java.util.Date;
 
 import static ru.clevertec.check.exception.ProductExceptionConstants.*;
 import static ru.clevertec.check.service.CheckConstants.CHECKFILEPDF;
-import static ru.clevertec.check.utils.mail.JavaMailProperties.*;
+import static ru.clevertec.check.utils.mailer.JavaMailProperties.*;
 
 public class JavaMailUtil {
     private static Logger logger = LogManager.getLogger();

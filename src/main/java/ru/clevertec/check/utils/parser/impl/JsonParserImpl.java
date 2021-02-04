@@ -1,8 +1,11 @@
 package ru.clevertec.check.utils.parser.impl;
 
 import ru.clevertec.check.utils.parser.JsonParser;
+
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 public class JsonParserImpl implements JsonParser {
 
@@ -54,16 +57,8 @@ public class JsonParserImpl implements JsonParser {
                 appendIntegerArray(sb, object);
                 return sb.toString();
             }
-            case "int[]" -> {
+            case "int[]", "Boolean", "Double" -> {
                 appendIntArray(sb, object);
-                return sb.toString();
-            }
-            case "Boolean" -> {
-                sb.append(object.toString());
-                return sb.toString();
-            }
-            case "Double" -> {
-                sb.append(object.toString());
                 return sb.toString();
             }
         }
@@ -80,7 +75,7 @@ public class JsonParserImpl implements JsonParser {
                 sb.append(name);
                 sb.append(QUOTE);
                 sb.append(COLON);
-                markObject(sb, value);
+                markValue(sb, value);
                 if (i < fields.length - 1) {
                     sb.append(COMMA);
                 }
@@ -90,7 +85,7 @@ public class JsonParserImpl implements JsonParser {
         return sb.toString();
     }
 
-    private void markObject(StringBuilder sb, Object obj) throws IllegalAccessException {
+    private void markValue(StringBuilder sb, Object obj) throws IllegalAccessException {
         if (Collection.class.isAssignableFrom(obj.getClass())) {
             appendCollection(sb, obj);
         } else if (Map.class.isAssignableFrom(obj.getClass())) {
@@ -104,9 +99,7 @@ public class JsonParserImpl implements JsonParser {
         } else {
             switch (obj.getClass().getSimpleName()) {
                 case "String" -> sb.append(QUOTE).append(obj).append(QUOTE);
-                case "Integer" -> sb.append(obj);
-                case "Boolean" -> sb.append(obj);
-                case "Double" -> sb.append(obj);
+                case "Integer", "Boolean", "Double" -> sb.append(obj);
             }
         }
     }
@@ -122,7 +115,7 @@ public class JsonParserImpl implements JsonParser {
             sb.append(keysArray[i]);
             sb.append(QUOTE);
             sb.append(COLON);
-            markObject(sb, valuesArray[i]);
+            markValue(sb, valuesArray[i]);
             if (i < keysArray.length - 1) {
                 sb.append(COMMA);
             }

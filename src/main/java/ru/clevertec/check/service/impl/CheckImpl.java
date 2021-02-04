@@ -1,19 +1,24 @@
 package ru.clevertec.check.service.impl;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 import ru.clevertec.check.annotations.log.LogMe;
 import ru.clevertec.check.dao.Repository;
 import ru.clevertec.check.entities.Card;
+import ru.clevertec.check.entities.parameters.ProductParameters;
+import ru.clevertec.check.exception.ProductException;
 import ru.clevertec.check.observer.Publisher;
 import ru.clevertec.check.service.Check;
-import ru.clevertec.check.exception.ProductException;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
-import ru.clevertec.check.entities.parameters.ProductParameters;
 
 import javax.mail.MessagingException;
-import java.util.List;
 import java.io.*;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static ru.clevertec.check.exception.ProductExceptionConstants.*;
@@ -70,9 +75,9 @@ public class CheckImpl implements Check {
                 card = new Card(entry.getValue());
             }
         }
-        sb.append(TRANFER);
+        sb.append(TRANSFER);
         if (card.getNumber() == CARD_RANGE_0) {
-            sb.append(" \nNo Discount Card ");
+            sb.append("No Discount Card ");
             sb.append(String.format(DISCOUNT, discount));
             sb.append(String.format(PRICE, totalPrice));
         } else {
@@ -137,7 +142,7 @@ public class CheckImpl implements Check {
                 card = new Card(entry.getValue());
             }
         }
-        sb.append(TRANFER);
+        sb.append(TRANSFER);
         if (card.getNumber() == CARD_RANGE_0) {
             sb.append("<pre>No Discount Card </pre>");
             sb.append(String.format(DISCOUNT_HTML, discount));
@@ -199,6 +204,76 @@ public class CheckImpl implements Check {
         } catch (IOException | MessagingException e) {
             throw new ProductException(IOEXCEPTION);
         }
+    }
+
+    @Override
+    public StringBuilder pdfCheck(List<ProductParameters> list) {
+        StringBuilder sb = new StringBuilder();
+        Date date = new Date();
+        Card card = new Card(0);
+        sb.append(DOUBLE_INDENT + TRANSPORT + TRANSPORT_HALF + "      CASH RECEIPT" + DOUBLE_INDENT).
+                append(TRANSPORT + TRANSPORT_HALF + "  supermarket 'The Two Geese' \n").
+                append(TRANSPORT + TRANSPORT_HALF + date + DOUBLE_INDENT).
+                append(TRANSPORT + "QTY        DESCRIPTION            PRICE         TOTAL \n");
+
+        int key;
+        int quantity;
+        double totalPriceProduct;
+        double totalPrice = 0;
+        double discount = 0;
+        String line;
+        int repositorySize = repository.getSize();
+        for (Map.Entry<String, Integer> entry : map.entrySet()
+        ) {
+            if (!entry.getKey().equals(CARD)) {
+                for (int i = 0; i <= list.size() - 1; i++) {
+                    key = Integer.parseInt(entry.getKey());
+                    if (list.get(i).getItemId() == key) {
+                        quantity = entry.getValue();
+                        if (list.get(i).isStock() && quantity >= repositorySize) {
+                            totalPriceProduct = list.get(i).getCost() * quantity * PERCENT90;
+                        } else {
+                            totalPriceProduct = list.get(i).getCost() * quantity;
+                        }
+                        line = String.format(" %43d  %18s %27.2f  %14.2f \n", quantity,
+                                list.get(i).getName(), list.get(i).getCost(), totalPriceProduct);
+                        totalPrice += totalPriceProduct;
+                        discount += list.get(i).getCost() * quantity - totalPriceProduct;
+                        sb.append(line);
+                    }
+                }
+            } else {
+                card = new Card(entry.getValue());
+            }
+        }
+        sb.append(TRANSPORT + TRANSFER_PDF);
+        double priceDiscount = 0;
+        if (card.getNumber() == CARD_RANGE_0) {
+            priceDiscount = discount;
+            sb.append("\n" + TRANSPORT + "No Discount Card");
+            sb.append(String.format(DISCOUNT_PDF_FORMAT, DISCOUNT_PDF, priceDiscount));
+            sb.append(String.format(PRICE_PDF_FORMAT, TOTAL_PRICE_PDF, totalPrice - priceDiscount));
+        } else {
+            if (card.getNumber() > CARD_RANGE_0 && card.getNumber() < CARD_RANGE_100) {
+                priceDiscount = discount + totalPrice * PERCENT3;
+                sb.append("\n" + TRANSPORT + "Your Card with 3% Discount Number " + card.getNumber());
+                sb.append(String.format(DISCOUNT_PDF_FORMAT, DISCOUNT_PDF, priceDiscount));
+                sb.append(String.format(PRICE_PDF_FORMAT, TOTAL_PRICE_PDF, totalPrice - priceDiscount));
+            }
+            if (card.getNumber() >= CARD_RANGE_100 && card.getNumber() < CARD_RANGE_1000) {
+                priceDiscount = discount + totalPrice * PERCENT4;
+                sb.append("\n" + TRANSPORT + "Your Card with 4% Discount Number " + card.getNumber());
+                sb.append(String.format(DISCOUNT_PDF_FORMAT, DISCOUNT_PDF, priceDiscount));
+                sb.append(String.format(PRICE_PDF_FORMAT, TOTAL_PRICE_PDF, totalPrice - priceDiscount));
+            }
+            if (card.getNumber() >= CARD_RANGE_1000) {
+                priceDiscount = discount + totalPrice * PERCENT5;
+                sb.append("\n" + TRANSPORT + "Your Card with 5% Discount Number " + card.getNumber());
+                sb.append(String.format(DISCOUNT_PDF_FORMAT, DISCOUNT_PDF, priceDiscount));
+                sb.append(String.format(PRICE_PDF_FORMAT, TOTAL_PRICE_PDF, totalPrice - priceDiscount));
+            }
+        }
+        return sb;
     }
 
     @Override
