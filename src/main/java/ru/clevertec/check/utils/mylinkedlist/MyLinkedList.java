@@ -132,7 +132,8 @@ public class MyLinkedList<E> implements List<E> {
         readLock.lock();
         try {
             if (index < 0 || index >= size) {
-                int ind = size - 1;
+                int ind = size;
+                index += 1;
                 throw new IndexOutOfBoundsException("Only " + ind + " indexes in list, you try to find " + index + "th");
             }
             Node<E> res = first;

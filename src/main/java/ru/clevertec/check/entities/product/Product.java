@@ -14,6 +14,7 @@ public class Product implements ProductParameters {
         this.cost = cost;
         this.stock = stock;
     }
+
     public Product(String name, double cost, boolean stock) {
         this.name = name;
         this.cost = cost;

@@ -10,7 +10,7 @@
         opacity: 0.5;
     }
 </style>
-<div class="semi"><pre>     New version of check</pre></div>
+<div class="semi"><pre>     New version of checkService</pre></div>
 <head><h2><pre><p><c:out value="    CASH RECEIPT"/></p></pre></h2></head>
 <h2><pre> <c:out value=' "The Two Geese"'/></pre></h2>
 <p><c:out value="${order.getDate()}"/></p>
@@ -51,7 +51,18 @@
 </c:if>
 <br/>
 <br/>
-<div class="semi"><pre>           Old version of check</pre></div>
+<form action="/check" method="GET">
+    <tr>
+        <th>Enter your email</th><br/>
+        <td><input type="text" name="mail" placeholder="mail"></td>
+        <br/>
+        <td><input type="submit" value="Send"></td>
+    </tr>
+    ${pageContext.request.contextPath}
+</form>
+<br/>
+<br/>
+<div class="semi"><pre>           Old version of checkService</pre></div>
 ${html}
 </body>
 </html>

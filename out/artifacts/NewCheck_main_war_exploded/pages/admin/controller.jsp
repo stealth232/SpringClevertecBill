@@ -5,6 +5,10 @@
     <title>Admin controller</title>
 </head>
 <body>
+<td>${String.format('%s %s %s %s',"Hello, ", user.getFirstName(), "! Your role is ", user.getUserType())}</td>
+<br/>
+<td>${"Choose DB to work"}</td>
+<br/>
 <form action="/pages/admin/users_editor.jsp" >
     <p><input type="submit" value=" Users "></p>
 </form>

@@ -2,7 +2,7 @@
 <!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
 <aspectj>
     <weaver options="-verbose -showWeaveInfo">
-        <include within="ru.clevertec.check..*"/>
+        <include within="ru.clevertec.checkService..*"/>
     </weaver>
     <aspects>
         <aspect name="ru.clevertec.aop.aspects.LogAspect"/>

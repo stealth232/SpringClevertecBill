@@ -1,6 +1,6 @@
 package ru.clevertec.check.observer;
 
-import ru.clevertec.check.exception.ProductException;
+import ru.clevertec.check.exception.ServiceException;
 import ru.clevertec.check.observer.entity.State;
 import ru.clevertec.check.observer.listeners.EventListener;
 
@@ -30,7 +30,7 @@ public class Publisher {
         eventListeners.remove(listener);
     }
 
-    public void notify(State eventType, String message) throws IOException, MessagingException, ProductException {
+    public void notify(State eventType, String message) throws IOException, MessagingException, ServiceException, ServiceException {
         List<EventListener> eventListeners = listeners.get(eventType);
         for (EventListener eventListener : eventListeners) {
             eventListener.update(eventType, message);

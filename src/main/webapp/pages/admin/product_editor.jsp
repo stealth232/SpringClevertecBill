@@ -10,11 +10,22 @@
 <form action="/admin_product" method="GET">
     <tr>
         <th>Update stock by ID</th><br/>
-        <td><input type="number" min="0"value="0" name="id" placeholder="id"></td>
+        <td><input type="number" min="0" value="0" name="id" placeholder="id"></td>
         <br/>
         <td><input type="text" value="true" name="stock" placeholder="stock"></td>
         <br/>
         <td><input type="submit" value="Update stock"></td>
+    </tr>
+    ${pageContext.request.contextPath}
+</form>
+<form action="/admin_cost" method="GET">
+    <tr>
+        <th>Update price by name</th><br/>
+        <td><input type="text" name="name" placeholder="name"></td>
+        <br/>
+        <td><input type="number" step="0.01" min="0" value="1" name="cost" placeholder="cost"></td>
+        <br/>
+        <td><input type="submit" value="Update price"></td>
     </tr>
     ${pageContext.request.contextPath}
 </form>
