@@ -2,13 +2,16 @@ package ru.clevertec.check.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.clevertec.check.dto.ResponseData;
 import ru.clevertec.check.model.user.User;
+import ru.clevertec.check.service.ControllerService;
 import ru.clevertec.check.service.UserService;
 import ru.clevertec.check.validators.UserValidator;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -18,18 +21,20 @@ import java.util.Optional;
 public class StartController {
     private final UserService userService;
     private final UserValidator userValidator;
+    private final ControllerService cs;
 
     @PostMapping("/registration")
-    public ResponseData<User> save(@RequestBody User user, BindingResult bindingResult) {
+    public ResponseEntity<?> save(@RequestBody @Valid User user, BindingResult bindingResult) {
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
-            return new ResponseData<>(null);
+            return new ResponseEntity<>(bindingResult.getAllErrors(), HttpStatus.NOT_ACCEPTABLE);
         }
-        return new ResponseData<>(userService.save(user));
+        return new ResponseEntity<>(userService.save(user), cs.generateHttpStatusForSave(user));
     }
 
     @GetMapping("/login")
-    public ResponseData<Optional<User>> login(String login, String password) {
-        return new ResponseData<>(userService.getUser(login, password));
+    public ResponseEntity<Optional<User>> login(String login, String password) {
+        return new ResponseEntity<>(userService.getUser(login, password),
+                cs.generateHttpStatus(userService.getUser(login, password)));
     }
 }

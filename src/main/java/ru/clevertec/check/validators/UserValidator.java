@@ -28,7 +28,10 @@ private final UserService userService;
         if(user.getLogin().length()<4 || user.getLogin().length()>32 ){
             errors.rejectValue("login", "Must be longer");
         }
-        System.out.println(user);
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "age", "required");
+        if(user.getAge()<10 || user.getAge()>100 ){
+            errors.rejectValue("age", "Must be in limit 10 - 100");
+        }
         if (Objects.nonNull(userService.getUserByLogin(user.getLogin()))) {
             errors.rejectValue("login", "", "User is already exist");
         }

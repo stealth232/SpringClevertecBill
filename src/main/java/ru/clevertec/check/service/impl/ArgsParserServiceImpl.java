@@ -22,7 +22,7 @@ public class ArgsParserServiceImpl implements ArgsParserService {
     @Override
     public List<String> parsParams(String[] args) throws ServiceException {
         List<String> products;
-        if (args[ZERO_INT].contains(TXT) || args[0].contains(XML) || args[0].contains(BIN)) {
+        if (args[ZERO_INT].contains(TXT) || args[ZERO_INT].contains(XML) || args[ZERO_INT].contains(BIN)) {
             String filePath = args[ZERO_INT];
             products = parsParams(filePath);
         } else {

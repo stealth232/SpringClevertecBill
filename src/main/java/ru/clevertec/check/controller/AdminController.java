@@ -3,10 +3,13 @@ package ru.clevertec.check.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.clevertec.check.dto.ResponseData;
+import ru.clevertec.check.model.product.Order;
 import ru.clevertec.check.model.product.Product;
 import ru.clevertec.check.model.user.User;
+import ru.clevertec.check.service.ControllerService;
+import ru.clevertec.check.service.DataOrderService;
 import ru.clevertec.check.service.ProductService;
 import ru.clevertec.check.service.UserService;
 
@@ -19,55 +22,69 @@ import java.util.List;
 public class AdminController {
     private final UserService userService;
     private final ProductService productService;
+    private final ControllerService cs;
+    private final DataOrderService dos;
 
     @GetMapping("/users")
-    public ResponseData<List<User>> getUsers() {
-        return new ResponseData<>(userService.findAll());
+    public ResponseEntity<?> getUsers() {
+        List<User> users = userService.findAll();
+        return new ResponseEntity<>(users, cs.generateHttpStatusForView(users));
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseData<?> deleteUser(@PathVariable Integer id) {
-        return new ResponseData<>(generateHttpStatus(userService.deleteUserById(id)));
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
+        return new ResponseEntity<>(cs.generateHttpStatusForDeletion(userService.deleteUserById(id)));
     }
 
-    @GetMapping("/users/{login}")
-    public ResponseData<User> getUserByLogin(@PathVariable String login) {
-        return new ResponseData<>(userService.getUserByLogin(login));
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
+        User user = userService.getUserById(id);
+        return new ResponseEntity<>(user, cs.generateHttpStatusForView(user));
     }
 
-    @PatchMapping("/users/{id}")
-    public ResponseData<?> changeRole(@PathVariable Integer id) {
-        return new ResponseData<>(generateHttpStatus(userService.changeRole(id)));
+    @GetMapping("/users/orders/{id}")
+    public ResponseEntity<?> getOrdersByUserId(@PathVariable Integer id) {
+        List<Order> orders = dos.getOrdersByUserId(id);
+        return new ResponseEntity<>(orders, cs.generateHttpStatusForView(orders));
     }
 
-    @PostMapping("/products")
-    public ResponseData<Product> saveProduct(@RequestBody Product product) {
-        return new ResponseData<>(productService.save(product));
+    @DeleteMapping("/users/orders/{id}")
+    public ResponseEntity<?> deleteOrdersByUserId(@PathVariable Integer id) {
+        Integer deleted = dos.removeDataOrdersByUserId(id);
+        return new ResponseEntity<>(deleted,
+                cs.generateHttpStatusForDeletion(deleted));
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> changeRole(@PathVariable Integer id) {
+        return new ResponseEntity<>(cs.generateHttpStatus(userService.changeRole(id)));
     }
 
     @GetMapping("/products")
-    public ResponseData<List<Product>> getProducts() {
-        return new ResponseData<>(productService.findAll());
+    public ResponseEntity<?> getProducts() {
+        List<Product> products = productService.findAll();
+        return new ResponseEntity<>(products, cs.generateHttpStatusForView(products));
     }
 
-    @PatchMapping("/products/{id}")
-    public ResponseData<?> changeStock(@PathVariable Integer id) {
-        return new ResponseData<>(generateHttpStatus(productService.changeStockById(id)));
+    @PostMapping("/products")
+    public ResponseEntity<?> saveProduct(@RequestBody Product product) {
+        Product savedProduct = productService.save(product);
+        return new ResponseEntity<>(savedProduct, cs.generateHttpStatusForSave(savedProduct));
+    }
+
+    @PutMapping("/products/{id}")
+    public ResponseEntity<?> changeStock(@PathVariable Integer id) {
+        return new ResponseEntity<>(cs.generateHttpStatus(productService.changeStockById(id)));
     }
 
     @DeleteMapping("/products/{id}")
-    public ResponseData<?> deleteProduct(@PathVariable Integer id) {
-        return new ResponseData<>(generateHttpStatus(productService.deleteProductById(id)));
+    public ResponseEntity<?> deleteProduct(@PathVariable Integer id) {
+        return new ResponseEntity<>(cs.generateHttpStatusForDeletion(productService.deleteProductById(id)));
     }
 
-    @PutMapping("/products/cost/{id}")
-    public ResponseData<?> setCost(@RequestParam("cost") double cost,
-                                   @PathVariable Integer id) {
-        return new ResponseData<>(generateHttpStatus(productService.updateCost(cost, id)));
-    }
-
-    private HttpStatus generateHttpStatus(Integer result) {
-        if (result > 0) return HttpStatus.OK;
-        else return HttpStatus.NOT_MODIFIED;
+    @PatchMapping("/products/cost/{id}")
+    public ResponseEntity<?> setCost(@RequestParam("cost") double cost,
+                                     @PathVariable Integer id) {
+        return new ResponseEntity<>(cs.generateHttpStatus(productService.updateCost(cost, id)));
     }
 }

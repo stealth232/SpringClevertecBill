@@ -21,6 +21,8 @@ public interface UserService extends UserDetailsService {
 
     Integer changeRole(Integer id);
 
+    User getUserById(Integer id);
+
     Optional<User> getUser(String login, String password);
 
     UserDetails loadUserByUsername(String login) throws UsernameNotFoundException;

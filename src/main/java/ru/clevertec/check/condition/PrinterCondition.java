@@ -4,11 +4,12 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
+import static ru.clevertec.check.service.CheckConstants.CLEVERTEC_TEMPLATE;
+
 public class PrinterCondition implements Condition {
-    public static final String clevertec_Template = "templates/Clevertec_Template.pdf";
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return context.getResourceLoader().getResource(clevertec_Template).exists();
+        return context.getResourceLoader().getResource(CLEVERTEC_TEMPLATE).exists();
     }
 }

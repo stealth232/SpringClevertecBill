@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface CheckService {
 
-    StringBuilder getTXT(Map<String, Integer> map) throws ServiceException;
+    StringBuilder getTXT(Map<String, Integer> map, Integer id) throws ServiceException;
 
     StringBuilder getHTML(Map<String, Integer> map);
 

@@ -30,7 +30,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByLogin(String login) {
-        return userRepository.getUserByLogin(login);
+        Optional<User> userByLogin = findUserByLogin(login);
+        if(userByLogin.isPresent()){
+        return userRepository.getUserByLogin(login);}
+        return null;
     }
 
     @Override
@@ -63,15 +66,25 @@ public class UserServiceImpl implements UserService {
     public Integer changeRole(Integer id) {
         User user = userRepository.getUserById(id);
         Set<Role> role = new HashSet<>();
-        if (user.getRoles().stream().findFirst().get().getName().equals(ROLE_USER)) {
-            role.add(new Role(1L, ROLE_ADMIN));
+        if(Objects.nonNull(user)){
+            if (user.getRoles().stream().findFirst().get().getName().equals(ROLE_USER)) {
+                role.add(new Role(1L, ROLE_ADMIN));
+            }
+            if (user.getRoles().stream().findFirst().get().getName().equals(ROLE_ADMIN)) {
+                role.add(new Role(2L, ROLE_USER));
+            }
+            user.setRoles(role);
+            userRepository.save(user);
+            return user.getId();
         }
-        if (user.getRoles().stream().findFirst().get().getName().equals(ROLE_ADMIN)) {
-            role.add(new Role(2L, ROLE_USER));
-        }
-        user.setRoles(role);
-        userRepository.save(user);
-        return user.getId();
+        return 0;
+    }
+
+    @Override
+    public User getUserById(Integer id){
+       if(userRepository.existsById(id))
+        return userRepository.getUserById(id);
+       return null;
     }
 
     @Override

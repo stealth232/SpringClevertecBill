@@ -3,6 +3,7 @@ package ru.clevertec.check.service;
 public class CheckConstants {
     public static final String CHECKFILETXT = "D:\\check.txt";
     public static final String CHECKFILEPDF = "D:\\check.pdf";
+    public static final String CLEVERTEC_TEMPLATE = "templates/Clevertec_Template.pdf";
     public static final String PDFTEMPLATE = "C:\\Users\\Stealth\\IdeaProjects\\NewCheck\\src\\main\\resources\\templates\\Clevertec_Template.pdf";
     public static final String THRIPLE_INDENT = "\n" + "\n" + "\n";
     public static final String DOUBLE_INDENT = "\n\n";

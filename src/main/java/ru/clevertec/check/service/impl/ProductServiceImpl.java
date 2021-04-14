@@ -8,6 +8,9 @@ import ru.clevertec.check.model.product.Product;
 import ru.clevertec.check.service.ProductService;
 
 import java.util.List;
+import java.util.Objects;
+
+import static ru.clevertec.check.service.CheckConstants.ZERO_INT;
 
 @Service
 @Transactional
@@ -38,18 +41,23 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Integer changeStockById(Integer id) {
         Product product = productRepository.getProductById(id);
-        Boolean stock = null;
-        if (product.isStock()) {
-            stock = Boolean.FALSE;
-        } else if (!product.isStock()) {
-            stock = Boolean.TRUE;
+        if(Objects.nonNull(product)){
+            Boolean stock = null;
+            if (product.isStock()) {
+                stock = Boolean.FALSE;
+            } else if (!product.isStock()) {
+                stock = Boolean.TRUE;
+            }
+            return productRepository.updateStock(stock, id);
         }
-        return productRepository.updateStock(stock, id);
+        return ZERO_INT;
     }
 
     @Override
     public Product save(Product product) {
+        if(Objects.isNull(getProductByName(product.getName())))
         return productRepository.save(product);
+        return null;
     }
 
     @Override

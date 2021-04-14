@@ -1,30 +1,18 @@
 package ru.clevertec.check.service.impl;
 
 import com.google.gson.Gson;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfImportedPage;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfWriter;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.clevertec.check.dto.OrderRepository;
-import ru.clevertec.check.exception.ProductExceptionConstants;
-import ru.clevertec.check.exception.ServiceException;
-import ru.clevertec.check.model.DataOrder;
+import ru.clevertec.check.model.order.DataOrder;
 import ru.clevertec.check.service.CheckService;
 import ru.clevertec.check.dto.ProductRepository;
 import ru.clevertec.check.model.product.Card;
 import ru.clevertec.check.model.product.Order;
 import ru.clevertec.check.model.product.Product;
 import ru.clevertec.check.model.product.SingleProduct;
-import ru.clevertec.check.service.PrintService;
-
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
 import java.util.*;
 
 import static ru.clevertec.check.service.CheckConstants.*;
@@ -35,13 +23,16 @@ public class CheckServiceImpl implements CheckService {
 
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
-    private final PrintService printService;
     private final Gson gson;
 
     @Override
-    public StringBuilder getTXT(Map<String, Integer> map) throws ServiceException {
+    public StringBuilder getTXT(Map<String, Integer> map, Integer id){
         StringBuilder sb = new StringBuilder();
+        DataOrder dataOrder = new DataOrder();
         Order order = getOrder(map);
+        dataOrder.setUserId(id);
+        dataOrder.setJson(gson.toJson(order));
+        orderRepository.save(dataOrder);
         sb.append("\n\n              CASH RECEIPT\n\n").
                 append("       supermarket 'The Two Geese' \n").
                 append("      " + new Date().toString() + "\n\n").
@@ -82,42 +73,6 @@ public class CheckServiceImpl implements CheckService {
         return sb;
     }
 
-    public StringBuilder buildSingleProducts(Map<String, Integer> map, String format) {
-        List<Product> list = productRepository.findAll();
-        StringBuilder sb = new StringBuilder();
-        String key;
-        int quantity;
-        String line;
-        double totalPriceProduct;
-        double totalPrice = ZERO_INT;
-        double discount = ZERO_INT;
-        Card card;
-        for (Map.Entry<String, Integer> entry : map.entrySet()
-        ) {
-            if (!entry.getKey().equals(CARD)) {
-                for (int i = ZERO_INT; i < list.size(); i++) {
-                    key = entry.getKey();
-                    if (list.get(i).getName().equals(key)) {
-                        quantity = entry.getValue();
-                        if (list.get(i).isStock() && quantity >= PRODUCT_NUMBER) {
-                            totalPriceProduct = list.get(i).getCost() * quantity * PERCENT90;
-                        } else {
-                            totalPriceProduct = list.get(i).getCost() * quantity;
-                        }
-                        line = String.format(format, quantity,
-                                list.get(i).getName(), list.get(i).getCost(), totalPriceProduct);
-                        totalPrice += totalPriceProduct;
-                        discount += list.get(i).getCost() * quantity - totalPriceProduct;
-                        sb.append(line);
-                    }
-                }
-            } else {
-                card = new Card(entry.getValue());
-            }
-        }
-        return sb;
-    }
-
     @Override
     public Order getOrder(Map<String, Integer> map) {
         List<SingleProduct> products = getSingleProducts(map);
@@ -149,13 +104,7 @@ public class CheckServiceImpl implements CheckService {
         order.setCardPercent(cardPercent);
         order.setDiscount(totalDiscount);
         order.setTotalPrice(totalPrice);
-        DataOrder dataOrder = new DataOrder();
-        dataOrder.setUserId(4);
-        dataOrder.setJson(gson.toJson(order));
-        orderRepository.save(dataOrder);
-        //gson.fromJson(orderRepository.findById(2).get().getJson(), Order.class);
         return order;
-
     }
 
     @Override
@@ -199,6 +148,42 @@ public class CheckServiceImpl implements CheckService {
         }
 
         return getStockPrice(products);
+    }
+
+    private StringBuilder buildSingleProducts(Map<String, Integer> map, String format) {
+        List<Product> list = productRepository.findAll();
+        StringBuilder sb = new StringBuilder();
+        String key;
+        int quantity;
+        String line;
+        double totalPriceProduct;
+        double totalPrice = ZERO_INT;
+        double discount = ZERO_INT;
+        Card card;
+        for (Map.Entry<String, Integer> entry : map.entrySet()
+        ) {
+            if (!entry.getKey().equals(CARD)) {
+                for (int i = ZERO_INT; i < list.size(); i++) {
+                    key = entry.getKey();
+                    if (list.get(i).getName().equals(key)) {
+                        quantity = entry.getValue();
+                        if (list.get(i).isStock() && quantity >= PRODUCT_NUMBER) {
+                            totalPriceProduct = list.get(i).getCost() * quantity * PERCENT90;
+                        } else {
+                            totalPriceProduct = list.get(i).getCost() * quantity;
+                        }
+                        line = String.format(format, quantity,
+                                list.get(i).getName(), list.get(i).getCost(), totalPriceProduct);
+                        totalPrice += totalPriceProduct;
+                        discount += list.get(i).getCost() * quantity - totalPriceProduct;
+                        sb.append(line);
+                    }
+                }
+            } else {
+                card = new Card(entry.getValue());
+            }
+        }
+        return sb;
     }
 
     private double getPercent(Card card) {
