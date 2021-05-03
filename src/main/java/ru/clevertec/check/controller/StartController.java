@@ -12,6 +12,7 @@ import ru.clevertec.check.service.UserService;
 import ru.clevertec.check.validators.UserValidator;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -36,5 +37,11 @@ public class StartController {
     public ResponseEntity<Optional<User>> login(String login, String password) {
         return new ResponseEntity<>(userService.getUser(login, password),
                 cs.generateHttpStatus(userService.getUser(login, password)));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getUsers() {
+        List<User> users = userService.findAll();
+        return new ResponseEntity<>(users, cs.generateHttpStatusForView(users));
     }
 }

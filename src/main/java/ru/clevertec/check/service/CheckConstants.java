@@ -4,15 +4,13 @@ public class CheckConstants {
     public static final String CHECKFILETXT = "D:\\check.txt";
     public static final String CHECKFILEPDF = "D:\\check.pdf";
     public static final String CLEVERTEC_TEMPLATE = "templates/Clevertec_Template.pdf";
-    public static final String PDFTEMPLATE = "C:\\Users\\Stealth\\IdeaProjects\\NewCheck\\src\\main\\resources\\templates\\Clevertec_Template.pdf";
+    public static final String PDFTEMPLATE = "E:\\School\\Clev\\CheckSpringBoot\\src\\main\\resources\\templates\\Clevertec_Template.pdf";
     public static final String THRIPLE_INDENT = "\n" + "\n" + "\n";
     public static final String DOUBLE_INDENT = "\n\n";
     public static final String INDENT = "\n";
 
     public static final String CARD = "Card";
-    public static final String URL_CARD = "card-";
-    public static final String URL_DELIMETER = "-";
-    public static final String TEXT_HTML = "text/html";
+    public static final String EMPTY = "";
     public static final String TRANSFER = "\n========================================= \n";
     public static final String TRANSFER_HTML = "\n==================================== \n";
     public static final String TRANSFER_PDF = "=========================================";
@@ -22,8 +20,6 @@ public class CheckConstants {
     public static final String NO_CARD = "No Discount Card ";
     public static final String DISCOUNT_PDF = "Your Discount";
     public static final String TOTAL_PRICE_PDF = "Total Price";
-    public static final String CHECK_TXT = "Check was printed in TXT file";
-    public static final String CHECK_PDF = "Check was printed in PDF file";
     public static final String CARD3 = "Your Card with 3% Discount Number ";
     public static final String CARD4 = "Your Card with 4% Discount Number ";
     public static final String CARD5 = "Your Card with 5% Discount Number ";
@@ -37,7 +33,6 @@ public class CheckConstants {
     public static final String OUTPUT_TXT = "%-3d  %-18s %8.2f %8.2f \n";
     public static final String HTML_OPEN = "<html>";
     public static final String HTML_CLOSE = "</html>";
-    public static final String ZERO = "0";
     public static final Integer PAGENUMBER = 1;
     public static final Integer ZERO_INT = 0;
     public static final Integer ONE_INT = 1;
@@ -61,4 +56,7 @@ public class CheckConstants {
 
     public static final String ROLE_USER = "ROLE_USER";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
+
+    public static final String NO_PARAMS = "Is exist or wrong params";;
+    public static final String DONT_EXIST = "Dont exist";
 }

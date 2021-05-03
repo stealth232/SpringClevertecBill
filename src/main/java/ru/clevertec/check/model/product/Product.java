@@ -16,8 +16,9 @@ import javax.validation.constraints.*;
 @Builder
 public class Product{
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "Product name is required")
     @Size(min = 3, max = 20, message = "Product name must contains 3 - 20 symbols")

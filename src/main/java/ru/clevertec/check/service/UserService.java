@@ -6,9 +6,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ru.clevertec.check.model.user.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserService extends UserDetailsService {
+
     User getUserByLogin(String login);
 
     User save(User user);
@@ -23,7 +25,11 @@ public interface UserService extends UserDetailsService {
 
     User getUserById(Integer id);
 
+    User findUserById(Integer id);
+
     Optional<User> getUser(String login, String password);
+
+    Map<String, String> getUserByRoles();
 
     UserDetails loadUserByUsername(String login) throws UsernameNotFoundException;
 }

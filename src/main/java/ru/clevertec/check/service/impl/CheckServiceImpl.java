@@ -2,15 +2,21 @@ package ru.clevertec.check.service.impl;
 
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
-import ru.clevertec.check.dto.OrderRepository;
+import ru.clevertec.check.dao.OrderRepository;
+import ru.clevertec.check.dao.ProductRepository;
+import ru.clevertec.check.dao.UserRepository;
+import ru.clevertec.check.dao.WarehouseRepository;
 import ru.clevertec.check.model.order.DataOrder;
-import ru.clevertec.check.service.CheckService;
-import ru.clevertec.check.dto.ProductRepository;
 import ru.clevertec.check.model.product.Card;
 import ru.clevertec.check.model.product.Order;
 import ru.clevertec.check.model.product.Product;
 import ru.clevertec.check.model.product.SingleProduct;
+import ru.clevertec.check.model.user.User;
+import ru.clevertec.check.service.CheckService;
+import ru.clevertec.check.service.MailService;
+import ru.clevertec.check.service.PrintService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -20,26 +26,27 @@ import static ru.clevertec.check.service.CheckConstants.*;
 @AllArgsConstructor
 @Service
 public class CheckServiceImpl implements CheckService {
-
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final WarehouseRepository warehouseRepository;
+    private final UserRepository userRepository;
+    private final MailService mailService;
+    private final PrintService printService;
     private final Gson gson;
 
     @Override
-    public StringBuilder getTXT(Map<String, Integer> map, Integer id){
+    public StringBuilder getTXT(Map<String, Integer> map, Integer id) {
         StringBuilder sb = new StringBuilder();
-        DataOrder dataOrder = new DataOrder();
         Order order = getOrder(map);
-        dataOrder.setUserId(id);
-        dataOrder.setJson(gson.toJson(order));
-        orderRepository.save(dataOrder);
+        saveDataOrder(map, id);
         sb.append("\n\n              CASH RECEIPT\n\n").
                 append("       supermarket 'The Two Geese' \n").
                 append("      " + new Date().toString() + "\n\n").
                 append("QTY  DESCRIPTION            PRICE   TOTAL \n");
         sb.append(buildSingleProducts(map, OUTPUT_TXT));
         sb.append(TRANSFER);
-        sb.append(getCardTXT(order.getCard().getNumber(), order.getTotalPrice(), order.getDiscount()));
+        sb.append(getCardTXT(order.getCard().getNumber(),
+                order.getTotalPrice(), order.getDiscount()));
         return sb;
     }
 
@@ -73,6 +80,23 @@ public class CheckServiceImpl implements CheckService {
         return sb;
     }
 
+    @SneakyThrows
+    @Override
+    public void getPDFFromOrder(Order order) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(DOUBLE_INDENT + TRANSPORT + TRANSPORT_HALF + "      CASH RECEIPT" + DOUBLE_INDENT).
+                append(TRANSPORT + TRANSPORT_HALF + "  supermarket 'The Two Geese' \n").
+                append(TRANSPORT + TRANSPORT_HALF + order.getDate() + DOUBLE_INDENT).
+                append(TRANSPORT + "QTY        DESCRIPTION            PRICE         TOTAL \n");
+        for (SingleProduct product : order.getProducts()) {
+            sb.append(String.format(OUTPUT_PDF, product.getQuantity(), product.getName(),
+                    product.getPrice(), product.getTotalPrice()));
+        }
+        sb.append(TRANSPORT + TRANSFER_PDF);
+        sb.append(getCardPDF(order.getCard().getNumber(), order.getTotalPrice(), order.getDiscount()));
+        printService.printPDFCheck(sb);
+    }
+
     @Override
     public Order getOrder(Map<String, Integer> map) {
         List<SingleProduct> products = getSingleProducts(map);
@@ -92,8 +116,7 @@ public class CheckServiceImpl implements CheckService {
                 cardPercent = ONE_INT;
             }
         }
-        for (SingleProduct product : products
-        ) {
+        for (SingleProduct product : products) {
             totalPriceWODiscount += product.getQuantity() * product.getPrice();
             totalPrice += product.getTotalPrice();
         }
@@ -112,17 +135,34 @@ public class CheckServiceImpl implements CheckService {
         List<Product> products = productRepository.findAll();
         Map<String, Integer> purchaseParameters = new HashMap<>();
         for (Product item : products) {
-            if (request.getParameter(item.getName()) != null &&
+            if (Objects.nonNull(request.getParameter(item.getName())) &&
                     !request.getParameter(item.getName()).isBlank()) {
                 purchaseParameters.put(item.getName(), Integer.parseInt(request.getParameter(item.getName())));
             }
         }
-        if (!request.getParameter(CARD).isBlank()) {
+        if (request.getParameter(CARD) != null && !request.getParameter(CARD).isBlank()) {
             purchaseParameters.put(CARD, Integer.parseInt(request.getParameter(CARD)));
         } else {
             purchaseParameters.put(CARD, ZERO_INT);
         }
         return purchaseParameters;
+    }
+
+    @Override
+    public Order sendCheckToEmail(Integer id) {
+        User user = userRepository.getUserById(id);
+        List<DataOrder> orders = orderRepository.getDataOrdersByUserId(id);
+        getPDFFromOrder(gson.fromJson(orders.get(orders.size() - ONE_INT).getJson(), Order.class));
+        mailService.send(user.getEmail(), CHECKFILEPDF);
+        return gson.fromJson(orders.get(orders.size() - ONE_INT).getJson(), Order.class);
+    }
+
+    private void saveDataOrder(Map<String, Integer> map, Integer id) {
+        DataOrder dataOrder = new DataOrder();
+        Order order = getOrder(map);
+        dataOrder.setUserId(id);
+        dataOrder.setJson(gson.toJson(order));
+        orderRepository.save(dataOrder);
     }
 
     private List<SingleProduct> getSingleProducts(Map<String, Integer> map) {
@@ -153,34 +193,45 @@ public class CheckServiceImpl implements CheckService {
     private StringBuilder buildSingleProducts(Map<String, Integer> map, String format) {
         List<Product> list = productRepository.findAll();
         StringBuilder sb = new StringBuilder();
-        String key;
-        int quantity;
-        String line;
+        String line = null;
         double totalPriceProduct;
         double totalPrice = ZERO_INT;
         double discount = ZERO_INT;
-        Card card;
         for (Map.Entry<String, Integer> entry : map.entrySet()
         ) {
             if (!entry.getKey().equals(CARD)) {
-                for (int i = ZERO_INT; i < list.size(); i++) {
-                    key = entry.getKey();
-                    if (list.get(i).getName().equals(key)) {
-                        quantity = entry.getValue();
-                        if (list.get(i).isStock() && quantity >= PRODUCT_NUMBER) {
-                            totalPriceProduct = list.get(i).getCost() * quantity * PERCENT90;
+                for (Product product : list) {
+                    String key = entry.getKey();
+                    int quantity = entry.getValue();
+                    Integer repositoryQuantity = warehouseRepository.getQuantity(key);
+                    if (product.getName().equalsIgnoreCase(key) && quantity <= repositoryQuantity) {
+                        if (product.isStock() && quantity >= PRODUCT_NUMBER) {
+                            totalPriceProduct = product.getCost() * quantity * PERCENT90;
                         } else {
-                            totalPriceProduct = list.get(i).getCost() * quantity;
+                            totalPriceProduct = product.getCost() * quantity;
                         }
                         line = String.format(format, quantity,
-                                list.get(i).getName(), list.get(i).getCost(), totalPriceProduct);
+                                product.getName(), product.getCost(), totalPriceProduct);
                         totalPrice += totalPriceProduct;
-                        discount += list.get(i).getCost() * quantity - totalPriceProduct;
+                        discount += product.getCost() * quantity - totalPriceProduct;
+                        warehouseRepository.updateQuantity(repositoryQuantity - quantity, key);
+                        sb.append(line);
+                    } else if (product.getName().equalsIgnoreCase(key) && quantity > repositoryQuantity) {
+                        if (product.isStock() && quantity >= PRODUCT_NUMBER) {
+                            totalPriceProduct = product.getCost() * repositoryQuantity * PERCENT90;
+                        } else {
+                            totalPriceProduct = product.getCost() * repositoryQuantity;
+                        }
+                        line = String.format(format, repositoryQuantity,
+                                product.getName(), product.getCost(), totalPriceProduct);
+                        totalPrice += totalPriceProduct;
+                        discount += product.getCost() * quantity - totalPriceProduct;
+                        warehouseRepository.updateQuantity(ZERO_INT, key);
                         sb.append(line);
                     }
                 }
             } else {
-                card = new Card(entry.getValue());
+                new Card(entry.getValue());
             }
         }
         return sb;

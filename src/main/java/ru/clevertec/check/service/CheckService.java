@@ -8,13 +8,17 @@ import java.util.Map;
 
 public interface CheckService {
 
-    StringBuilder getTXT(Map<String, Integer> map, Integer id) throws ServiceException;
+    StringBuilder getTXT(Map<String, Integer> map, Integer id);
 
     StringBuilder getHTML(Map<String, Integer> map);
 
     StringBuilder getPDF(Map<String, Integer> map);
 
+    void getPDFFromOrder(Order order);
+
     Order getOrder(Map<String, Integer> map);
 
     Map<String, Integer> selectProducts(HttpServletRequest request);
+
+    Order sendCheckToEmail(Integer id);
 }

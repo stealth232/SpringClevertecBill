@@ -19,6 +19,7 @@ import static ru.clevertec.check.service.CheckConstants.*;
 @PrinterAnnotation
 @Service
 public class PrintServiceImpl implements PrintService {
+
     @Override
     public void printCheck(StringBuilder sb) throws ServiceException {
         File file = new File(CHECKFILETXT);

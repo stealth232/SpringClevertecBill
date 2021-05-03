@@ -16,6 +16,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class UserValidator implements Validator {
 private final UserService userService;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return User.class.equals(clazz);

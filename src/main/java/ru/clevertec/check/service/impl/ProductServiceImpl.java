@@ -3,7 +3,8 @@ package ru.clevertec.check.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.clevertec.check.dto.ProductRepository;
+import ru.clevertec.check.dao.ProductRepository;
+import ru.clevertec.check.dao.WarehouseRepository;
 import ru.clevertec.check.model.product.Product;
 import ru.clevertec.check.service.ProductService;
 
@@ -17,6 +18,7 @@ import static ru.clevertec.check.service.CheckConstants.ZERO_INT;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final WarehouseRepository warehouseRepository;
 
     @Override
     public List<Product> findAll() {
@@ -35,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Integer deleteProductById(Integer id) {
+        warehouseRepository.deleteProductWarehouseById(id);
         return productRepository.deleteProductById(id);
     }
 
@@ -55,8 +58,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product save(Product product) {
-        if(Objects.isNull(getProductByName(product.getName())))
-        return productRepository.save(product);
+        if(Objects.isNull(getProductByName(product.getName()))){
+            Product savedProduct = productRepository.save(product);
+            warehouseRepository.saveToWarehouse(savedProduct.getId(),savedProduct.getName(),1000);
+            return savedProduct;
+        }
         return null;
     }
 

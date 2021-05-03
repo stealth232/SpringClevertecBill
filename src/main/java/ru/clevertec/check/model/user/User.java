@@ -32,10 +32,10 @@ public class User implements UserDetails {
     @Size(min = 2, max = 20, message = "Name must contains 2 - 20 symbols")
     private String firstName;
 
-    @Column(name = "second_name")
-    @NotBlank(message = "Second name must not be blank")
-    @Size(min = 2, max = 20, message = "Second name must contains 2 - 20 symbols")
-    private String secondName;
+    @Column(name = "email")
+    @NotBlank(message = "Email must not be blank")
+    @Size(min = 2, max = 20, message = "Email must contains 8 - 100 symbols")
+    private String email;
 
     @Column(name = "age")
     @Min(value = 10, message = "Age must not be less than 10")
@@ -52,7 +52,7 @@ public class User implements UserDetails {
     @Size(min = 3, message = "Password must contains min 6 symbols")
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(name = "users_security_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "roles_id"))
